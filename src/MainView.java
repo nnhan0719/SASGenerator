@@ -22,6 +22,7 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class MainView {
 
@@ -127,7 +128,6 @@ public class MainView {
 				if (array.length == 3) {
 					String result = GetSASToken(array[0], array[1], array[2], day);
 					txtSasToken.setText(result);
-//					txtSasToken.setText(array[0] +"+++"+ array[1] +"+++"+ array[2]);
 				} else {
 					txtSasToken.setText("Access Policies is invalid");
 				}
@@ -140,9 +140,9 @@ public class MainView {
 		btnGit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					java.awt.Desktop.getDesktop().browse(new URI("https://github.com/nnhan0719"));
+					java.awt.Desktop.getDesktop().browse(new URI("httpe://github.com/nnhan0719"));
 				} catch (Exception exception) {
-					
+					showMessageDialog(null, exception.getLocalizedMessage());
 				}
 			}
 		});
@@ -153,8 +153,7 @@ public class MainView {
 	private static String GetSASToken(String resourceUri, String keyName, String key, int day)
 	  {
 	      long epoch = System.currentTimeMillis()/1000L;
-//	      int week = 60*60*24*7;
-	      int week = 60*60*24*day;
+	      int week = (60*60*24*day);
 	      String expiry = Long.toString(epoch + week);
 
 	      String sasToken = null;
@@ -164,8 +163,7 @@ public class MainView {
 	          sasToken = "SharedAccessSignature sr=" + URLEncoder.encode(resourceUri, "UTF-8") +"&sig=" +
 	                  URLEncoder.encode(signature, "UTF-8") + "&se=" + expiry + "&skn=" + keyName;
 	      } catch (UnsupportedEncodingException e) {
-
-	          e.printStackTrace();
+			  showMessageDialog(null, e.getLocalizedMessage());
 	      }
 
 	      return sasToken;
@@ -182,15 +180,8 @@ public class MainView {
 	        Encoder encoder = Base64.getEncoder();
 
 	        hash = new String(encoder.encode(sha256_HMAC.doFinal(input.getBytes("UTF-8"))));
-
-	    } catch (InvalidKeyException e) {
-	        e.printStackTrace();
-	    } catch (NoSuchAlgorithmException e) {
-	        e.printStackTrace();
-	    } catch (IllegalStateException e) {
-	        e.printStackTrace();
-	    } catch (UnsupportedEncodingException e) {
-	        e.printStackTrace();
+	    } catch (Exception e) {
+			showMessageDialog(null, e.getLocalizedMessage());
 	    }
 
 	    return hash;
@@ -198,12 +189,13 @@ public class MainView {
 	
 	private static String[] SplitString(String accessPolicies) {
 		try {
-			String[] array = accessPolicies.split(";");
+			String[] array = accessPolicies.trim().split(";");
 			array[0] = array[0].replace("Endpoint=sb://", "").replace("/", "");
 			array[1] = array[1].replace("SharedAccessKeyName=", "");
 			array[2] = array[2].replace("SharedAccessKey=", "");
 			return array;
 		} catch (Exception e) {
+			showMessageDialog(null, e.getLocalizedMessage());
 			return new String[] {};
 		}
 	}
